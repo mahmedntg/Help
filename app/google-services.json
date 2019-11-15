@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "643181245649",
+    "firebase_url": "https://help-6e93c.firebaseio.com",
+    "project_id": "help-6e93c",
+    "storage_bucket": "help-6e93c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643181245649:android:f0e07824efdf8dbcdf81f0",
+        "android_client_info": {
+          "package_name": "com.dalal.help"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643181245649-qgkenurb9reqb5j5cqr2cv1oheet29di.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dalal.help",
+            "certificate_hash": "102c5c0adbd905ce6ad2cbdedfb6175e92b4be48"
+          }
+        },
+        {
+          "client_id": "643181245649-09jo0lf9t9ignd6us77enr7n5tciopp9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGhjp7ptrRgq--KxE-clT8YBukEzp1IuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643181245649-09jo0lf9t9ignd6us77enr7n5tciopp9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
