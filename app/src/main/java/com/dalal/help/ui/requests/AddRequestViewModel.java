@@ -1,14 +1,14 @@
-package com.dalal.help.ui.gallery;
+package com.dalal.help.ui.requests;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class AddRequestViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public AddRequestViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is gallery fragment");
     }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -75,6 +74,7 @@
                             android:layout_weight="1"
                             android:background="@color/transparent"
                             android:gravity="right|center"
+                            android:onClick="openLoginActivity"
                             android:text="Login"
                             android:textColor="@color/white"
                             android:textSize="@dimen/text_18" />
@@ -108,8 +108,49 @@
                         android:textColor="@color/white"
                         android:textSize="@dimen/text_16" />
 
+                    <RadioGroup
+                        android:id="@+id/typeRadioGroup"
+                        style="@style/Font_family_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="35dp"
+                        android:background="@color/transparent"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/padding_8"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/white"
+                        android:textSize="@dimen/text_18">
 
-                    <!--Name Details-->
+                        <RadioButton
+                            android:id="@+id/studentRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/transparent"
+                            android:buttonTint="@color/white"
+                            android:checked="true"
+                            android:drawablePadding="@dimen/padding_8"
+                            android:padding="@dimen/padding_8"
+                            android:text="@string/donor"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/white"
+                            android:textSize="@dimen/text_18" />
+
+                        <RadioButton
+                            android:id="@+id/donorRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:background="@color/transparent"
+                            android:buttonTint="@color/white"
+                            android:drawablePadding="@dimen/padding_8"
+                            android:padding="@dimen/padding_8"
+                            android:text="@string/donator"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/white"
+                            android:textSize="@dimen/text_18" />
+                    </RadioGroup>
 
 
                     <EditText
@@ -129,6 +170,29 @@
                         android:textColorHint="@color/white"
                         android:textSize="@dimen/text_18" />
 
+
+                    <View
+                        style="@style/Normal_Margin_Style"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_1"
+                        android:background="@color/view_line" />
+
+                    <EditText
+                        android:id="@+id/phone"
+                        style="@style/Font_family_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        android:drawableLeft="@drawable/ic_contact"
+                        android:drawablePadding="@dimen/padding_8"
+                        android:hint="Phone"
+                        android:inputType="phone"
+                        android:maxLength="30"
+                        android:maxLines="1"
+                        android:padding="@dimen/padding_16"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/white"
+                        android:textSize="@dimen/text_18" />
 
                     <View
                         style="@style/Normal_Margin_Style"
@@ -220,6 +284,7 @@
                     android:layout_marginRight="@dimen/margin_right_16"
                     android:layout_marginBottom="@dimen/margin_bottom_16"
                     android:background="@drawable/button_style"
+                    android:onClick="registerUser"
                     android:text="Join us"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_20" />

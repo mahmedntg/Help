@@ -7,37 +7,20 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.dalal.help.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.dalal.help.ui.requests.RequestsFragment"
+        android:label="@string/menu_requests"
+        tools:layout="@layout/fragment_requests" />
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.dalal.help.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:name="com.dalal.help.ui.requests.AddRequestFragment"
+        android:label="@string/menu_add_request"
+        tools:layout="@layout/fragment_add_request" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.dalal.help.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:name="com.dalal.help.ui.profile.ProfileFragment"
+        android:label="@string/menu_update_profile"
+        tools:layout="@layout/fragment_profile" />
 
-    <fragment
-        android:id="@+id/nav_tools"
-        android:name="com.dalal.help.ui.tools.ToolsFragment"
-        android:label="@string/menu_tools"
-        tools:layout="@layout/fragment_tools" />
-
-    <fragment
-        android:id="@+id/nav_share"
-        android:name="com.dalal.help.ui.share.ShareFragment"
-        android:label="@string/menu_share"
-        tools:layout="@layout/fragment_share" />
-
-    <fragment
-        android:id="@+id/nav_send"
-        android:name="com.dalal.help.ui.send.SendFragment"
-        android:label="@string/menu_send"
-        tools:layout="@layout/fragment_send" />
 </navigation>
