@@ -1,6 +1,8 @@
 package com.dalal.help.utils;
 
-public class Request {
+import java.io.Serializable;
+
+public class Request implements Serializable {
     private String name, description, status, userId, serviceType, key, userServiceType;
     private double amount;
 

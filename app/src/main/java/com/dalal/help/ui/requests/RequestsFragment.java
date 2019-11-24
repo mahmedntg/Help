@@ -42,7 +42,6 @@ public class RequestsFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private RequestAdapter mAdapter;
     private ProgressDialog progressDialog;
-    private boolean adminUser = true;
     private Spinner serviceTypeSpinner;
     List<String> serviceTypes = new ArrayList<>();
     private String serviceName;
