@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,12 +19,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.dalal.help.LoginActivity;
 import com.dalal.help.R;
 import com.dalal.help.call.APICall;
-import com.dalal.help.ui.requests.AddRequestFragment;
+import com.dalal.help.ui.requests.RequestsFragment;
 import com.dalal.help.utils.Request;
 import com.dalal.help.utils.RequestStatus;
 import com.dalal.help.utils.User;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,7 +44,8 @@ public class RequestDetailsFragment extends Fragment {
 
     private ProgressDialog progressDialog;
     private TextView nameTV, userTV, descriptionTV;
-    private User user;
+    private Button contactBtn, locationBtn, approveBtn, rejectBtn;
+    private User loginUser, userRequest;
     private DatabaseReference requestRef;
     private Request request;
     private EditText msg;
@@ -53,31 +58,76 @@ public class RequestDetailsFragment extends Fragment {
         progressDialog.setCancelable(false);
         requestRef = FirebaseDatabase.getInstance().getReference("requests");
         progressDialog.show();
+        contactBtn = view.findViewById(R.id.contact_btn);
+        locationBtn = view.findViewById(R.id.location_btn);
+        approveBtn = view.findViewById(R.id.approve_btn);
+        rejectBtn = view.findViewById(R.id.reject_btn);
         nameTV = (TextView) view.findViewById(R.id.serviceName);
         descriptionTV = (TextView) view.findViewById(R.id.description);
         userTV = (TextView) view.findViewById(R.id.user);
         request = (Request) getArguments().getSerializable("request");
+        nameTV.setText(request.getName());
         descriptionTV.setText(request.getDescription());
-        FirebaseDatabase.getInstance().getReference("users").child(request.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                nameTV.setText(user.getName());
-                progressDialog.hide();
+                loginUser = dataSnapshot.getValue(User.class);
+                if (!loginUser.getType().equalsIgnoreCase("donator")) {
+                    userTV.setVisibility(View.VISIBLE);
+                    contactBtn.setVisibility(View.VISIBLE);
+                    locationBtn.setVisibility(View.VISIBLE);
+                    approveBtn.setVisibility(View.VISIBLE);
+                    rejectBtn.setVisibility(View.VISIBLE);
+                    FirebaseDatabase.getInstance().getReference("users").child(request.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            userRequest = dataSnapshot.getValue(User.class);
+                            userTV.setText("XXX " + userRequest.getName().substring(5, 10) + " XXX");
+                            progressDialog.hide();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            progressDialog.hide();
+                        }
+                    });
+
+                }
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                progressDialog.hide();
             }
         });
-        userTV.setText(request.getUserId());
-        view.findViewById(R.id.contact_btn).setOnClickListener(new View.OnClickListener() {
+
+
+        contactBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                contactUser(userRequest.getPhone());
             }
         });
+        locationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openLocation();
+            }
+        });
+        approveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog(loginUser.getType().equalsIgnoreCase("donor") ? RequestStatus.COMPLETED : RequestStatus.ACCEPTED);
+            }
+        });
+        rejectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog(RequestStatus.REJECTED);
+            }
+        });
+
         return view;
     }
 
@@ -91,7 +141,7 @@ public class RequestDetailsFragment extends Fragment {
     }
 
     private void openLocation() {
-        String strUri = "http://maps.google.com/maps?q=loc:" + user.getLatitude() + "," + user.getLongitude() + " (" + user.getPhone() + ")";
+        String strUri = "http://maps.google.com/maps?q=loc:" + userRequest.getLatitude() + "," + userRequest.getLongitude() + " (" + userRequest.getPhone() + ")";
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(strUri));
 
         intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
@@ -100,34 +150,37 @@ public class RequestDetailsFragment extends Fragment {
     }
 
 
-    private void acceptRequest() {
-    }
-
-    private void rejectRequest() {
-    }
-
     private void updateStatus(RequestStatus status) {
         progressDialog.setMessage("Update R...");
         progressDialog.setIndeterminate(true);
         progressDialog.show();
         Map<String, Object> data = new HashMap<>();
         data.put("status", status.getValue());
-        data.put("adminComment", commentET.getText().toString());
+        data.put("reason", msg.getText().toString());
         requestRef.child(request.getKey()).updateChildren(data);
         progressDialog.hide();
-        AddRequestFragment addRequestFragment = new AddRequestFragment();
+        RequestsFragment requestsFragment = new RequestsFragment();
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, addRequestFragment);
+        fragmentTransaction.replace(R.id.nav_host_fragment, requestsFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        sendNotification();
+        String message;
+        if (TextUtils.isEmpty(msg.getText().toString().trim())) {
+            if (status.equals(RequestStatus.ACCEPTED))
+                message = "Your request has been approved";
+            else if (status.equals(RequestStatus.REJECTED))
+                message = "Your request has been rejected";
+            else
+                message = "Your request has been completed";
+        } else message = msg.getText().toString().trim();
+        sendNotification(message);
 
     }
 
-    private void sendNotification() {
+    private void sendNotification(String message) {
         APICall apiCall
                 = new APICall();
-        apiCall.sendNote(user.getToken(), "Announcement", msg.getText().toString());
+        apiCall.sendNote(userRequest.getToken(), "Request Processing", msg.getText().toString());
     }
 
     public void openDialog(final RequestStatus status) {
@@ -137,7 +190,7 @@ public class RequestDetailsFragment extends Fragment {
         // Set Custom Title
         TextView title = new TextView(getContext());
         // Title Properties
-        title.setText("Send Group Notification");
+        title.setText("Send User Notification");
         title.setPadding(10, 10, 10, 10);   // Set Position
         title.setGravity(Gravity.CENTER);
         title.setTextColor(Color.BLACK);
@@ -181,5 +234,25 @@ public class RequestDetailsFragment extends Fragment {
         negBtnLP.gravity = Gravity.FILL_HORIZONTAL;
         cancelBT.setTextColor(Color.RED);
         cancelBT.setLayoutParams(negBtnLP);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.cancel();
+        }
     }
 }

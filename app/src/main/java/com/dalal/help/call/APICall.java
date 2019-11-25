@@ -1,9 +1,9 @@
 package com.dalal.help.call;
 
-import java.io.IOException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.io.IOException;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -56,7 +56,7 @@ public class APICall implements Callback<NoteRes> {
         @Override
         public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
             Request originalRequest = chain.request();
-            Request.Builder builder = originalRequest.newBuilder().header("Authorization", "key=AIzaSyBtY2iCt3FQwyQXecjvBuIdBmnE1dpFex8");
+            Request.Builder builder = originalRequest.newBuilder().header("Authorization", "key=AIzaSyAxMMU7_3B_44G1yhnO3-PjhlkxTOK_8pQ");
             Request newRequest = builder.build();
             return chain.proceed(newRequest);
         }

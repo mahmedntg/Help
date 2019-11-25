@@ -1,8 +1,5 @@
 package com.dalal.help;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -23,8 +20,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.text.MessageFormat;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -80,15 +81,19 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    String userId = firebaseAuth.getCurrentUser().getUid();
+                    final String userId = firebaseAuth.getCurrentUser().getUid();
                     firebaseDatabase.getReference("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             User user = dataSnapshot.getValue(User.class);
-                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                                String token = preferences.getString("student_token", null);
-                                dataSnapshot.getRef().child("token").setValue(token);
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                            String token = preferences.getString("user_token", null);
+                            dataSnapshot.getRef().child("token").setValue(token);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString("user", new Gson().toJson(user));
+                            editor.apply();
+                            startActivity(intent);
 
                         }
 

@@ -1,8 +1,5 @@
 package com.dalal.help;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -24,6 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.MessageFormat;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -75,6 +75,10 @@ public class RegisterActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(name)) {
             message = MessageFormat.format(message, "Name");
             alertDialog.setMessage(message);
+            alertDialog.show();
+            return;
+        } else if (name.length() < 15) {
+            alertDialog.setMessage("Name should be minimum 15 characters");
             alertDialog.show();
             return;
         } else if (TextUtils.isEmpty(email)) {

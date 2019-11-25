@@ -94,7 +94,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        fragment.deleteItem(position, requestList.get(position).getKey());
                     }
                 });
             } else textView.setVisibility(View.GONE);

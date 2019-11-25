@@ -1,6 +1,8 @@
 package com.dalal.help.utils;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String userId, name, phone, email, password, type, token;
     private double latitude, longitude;
 

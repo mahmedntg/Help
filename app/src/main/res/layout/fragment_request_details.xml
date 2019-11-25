@@ -72,13 +72,14 @@
                     android:layout_marginBottom="@dimen/margin_top_8"
                     android:background="@drawable/edit_style"
                     android:drawablePadding="@dimen/padding_16"
-                    android:hint="Description"
                     android:inputType="textMultiLine"
                     android:lines="2"
                     android:padding="@dimen/padding_16"
                     android:textColor="@color/white"
+
                     android:textColorHint="@color/white"
-                    android:textSize="@dimen/text_20" />
+                    android:textSize="@dimen/text_20"
+                    android:tooltipText="Description" />
 
                 <TextView
                     android:id="@+id/user"
@@ -98,7 +99,8 @@
                     android:padding="@dimen/padding_16"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white"
-                    android:textSize="@dimen/text_20" />
+                    android:textSize="@dimen/text_20"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -112,30 +114,32 @@
                     <Button
                         android:id="@+id/contact_btn"
                         style="@style/Font_family_regular"
-                        android:layout_width="160dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/margin_right_4"
                         android:layout_marginTop="@dimen/margin_top_8"
                         android:layout_marginRight="@dimen/margin_right_4"
                         android:layout_marginBottom="@dimen/margin_top_8"
                         android:background="@drawable/red_style"
-                        android:text="Contact User"
+                        android:text="Contact"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/text_20" />
+                        android:textSize="@dimen/text_20"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/location_btn"
                         style="@style/Font_family_regular"
-                        android:layout_width="160dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/margin_right_8"
                         android:layout_marginTop="@dimen/margin_top_8"
                         android:layout_marginRight="@dimen/margin_right_8"
                         android:layout_marginBottom="@dimen/margin_top_8"
                         android:background="@drawable/red_style"
-                        android:text="Open Location"
+                        android:text="Location"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/text_20" />
+                        android:textSize="@dimen/text_20"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -150,7 +154,7 @@
                     <Button
                         android:id="@+id/approve_btn"
                         style="@style/Font_family_regular"
-                        android:layout_width="160dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/margin_right_4"
                         android:layout_marginTop="@dimen/margin_top_8"
@@ -159,12 +163,13 @@
                         android:background="@drawable/red_style"
                         android:text="Approve"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/text_20" />
+                        android:textSize="@dimen/text_20"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/reject_btn"
                         style="@style/Font_family_regular"
-                        android:layout_width="160dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/margin_right_8"
                         android:layout_marginTop="@dimen/margin_top_8"
@@ -173,7 +178,8 @@
                         android:background="@drawable/red_style"
                         android:text="Reject"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/text_20" />
+                        android:textSize="@dimen/text_20"
+                        android:visibility="gone" />
                 </LinearLayout>
 
             </LinearLayout>

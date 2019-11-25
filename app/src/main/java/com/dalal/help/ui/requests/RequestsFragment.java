@@ -1,8 +1,11 @@
 package com.dalal.help.ui.requests;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -11,11 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.dalal.help.LoginActivity;
 import com.dalal.help.R;
 import com.dalal.help.utils.Request;
 import com.dalal.help.utils.RequestAdapter;
 import com.dalal.help.utils.RequestStatus;
 import com.dalal.help.utils.User;
+import com.dalal.help.utils.UserType;
+import com.dalal.help.utils.UserUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -36,7 +42,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RequestsFragment extends Fragment {
+public class RequestsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     List<Request> requests;
     private DatabaseReference requestRef;
     private FirebaseAuth firebaseAuth;
@@ -81,19 +87,9 @@ public class RequestsFragment extends Fragment {
 
             }
         });
-        serviceName = "all";
-        serviceTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                serviceName = parent.getItemAtPosition(position).toString();
-                getUserRequests();
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        serviceTypeSpinner.setOnItemSelectedListener(this);
 
-            }
-        });
         requests = new ArrayList<>();
         recyclerView = (RecyclerView) view.findViewById(R.id.myRecyclerView);
         recyclerView.setHasFixedSize(true);
@@ -103,56 +99,46 @@ public class RequestsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new RequestAdapter(requests, this);
         recyclerView.setAdapter(mAdapter);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0 && fab.getVisibility() == View.VISIBLE) {
-                    fab.hide();
-                } else if (dy < 0 && fab.getVisibility() != View.VISIBLE) {
-                    fab.show();
+
+        user = UserUtils.getInstance(getActivity()).getUser();
+        if (user.getType().equals(UserType.DONATOR.getValue())) {
+            fab.show();
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    swapFragment();
                 }
-            }
-        });
+            });
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 0 && fab.getVisibility() == View.VISIBLE) {
+                        fab.hide();
+                    } else if (dy < 0 && fab.getVisibility() != View.VISIBLE) {
+                        fab.show();
+                    }
+                }
+            });
+        }
 
-        userRef = FirebaseDatabase.getInstance().getReference("users");
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                swapFragment();
-            }
-        });
         return view;
     }
 
-    public void getUserRequests() {
-        if (user == null) {
-            userRef.child(firebaseAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    user = dataSnapshot.getValue(User.class);
-                    if (!user.getType().equalsIgnoreCase("donator")) {
-                        fab.hide();
-                    }
-                    displayRequests();
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        } else {
-            displayRequests();
-        }
+    @Override
+    public void onResume() {
+        super.onResume();
+        displayRequests();
     }
 
     private void displayRequests() {
         Query query = requestRef;
-        if (user.getType().equalsIgnoreCase("admin") && !serviceName.equalsIgnoreCase("all")) {
-            query = requestRef.orderByChild("serviceType").equalTo(serviceName);
-
+        if (user.getType().equalsIgnoreCase("admin")) {
+            if (!serviceName.equalsIgnoreCase("All")) {
+                query = requestRef.orderByChild("serviceType").equalTo(serviceName);
+            }
         } else {
             query = !serviceName.equalsIgnoreCase("all") ? requestRef.orderByChild("userServiceType").equalTo(firebaseAuth.getCurrentUser().getUid() + "__" + serviceName)
                     : requestRef.orderByChild("userId").equalTo(firebaseAuth.getCurrentUser().getUid());
@@ -186,7 +172,8 @@ public class RequestsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.w("TodoApp", "getUser:onCancelled", databaseError.toException());
+                progressDialog.hide();
             }
         });
 
@@ -208,5 +195,37 @@ public class RequestsFragment extends Fragment {
         fragmentTransaction.replace(R.id.nav_host_fragment, addRequestFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        serviceName = parent.getItemAtPosition(position).toString();
+        displayRequests();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        serviceName = "All";
+        displayRequests();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                firebaseAuth.signOut();
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.cancel();
+        }
     }
 }
