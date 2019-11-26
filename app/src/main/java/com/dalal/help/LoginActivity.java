@@ -91,6 +91,7 @@ public class LoginActivity extends AppCompatActivity {
                             dataSnapshot.getRef().child("token").setValue(token);
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             SharedPreferences.Editor editor = preferences.edit();
+                            user.setUserId(userId);
                             editor.putString("user", new Gson().toJson(user));
                             editor.apply();
                             startActivity(intent);

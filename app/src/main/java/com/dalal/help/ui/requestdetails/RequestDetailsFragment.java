@@ -26,6 +26,8 @@ import com.dalal.help.ui.requests.RequestsFragment;
 import com.dalal.help.utils.Request;
 import com.dalal.help.utils.RequestStatus;
 import com.dalal.help.utils.User;
+import com.dalal.help.utils.UserType;
+import com.dalal.help.utils.UserUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -68,40 +70,28 @@ public class RequestDetailsFragment extends Fragment {
         request = (Request) getArguments().getSerializable("request");
         nameTV.setText(request.getName());
         descriptionTV.setText(request.getDescription());
-        FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                loginUser = dataSnapshot.getValue(User.class);
-                if (!loginUser.getType().equalsIgnoreCase("donator")) {
-                    userTV.setVisibility(View.VISIBLE);
-                    contactBtn.setVisibility(View.VISIBLE);
-                    locationBtn.setVisibility(View.VISIBLE);
-                    approveBtn.setVisibility(View.VISIBLE);
-                    rejectBtn.setVisibility(View.VISIBLE);
-                    FirebaseDatabase.getInstance().getReference("users").child(request.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            userRequest = dataSnapshot.getValue(User.class);
-                            userTV.setText("XXX " + userRequest.getName().substring(5, 10) + " XXX");
-                            progressDialog.hide();
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            progressDialog.hide();
-                        }
-                    });
-
+        loginUser = UserUtils.getInstance(getActivity()).getUser();
+        if (!loginUser.getType().equals(UserType.DONATOR.getValue())) {
+            userTV.setVisibility(View.VISIBLE);
+            contactBtn.setVisibility(View.VISIBLE);
+            locationBtn.setVisibility(View.VISIBLE);
+            approveBtn.setVisibility(View.VISIBLE);
+            rejectBtn.setVisibility(View.VISIBLE);
+            FirebaseDatabase.getInstance().getReference("users").child(request.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    userRequest = dataSnapshot.getValue(User.class);
+                    userTV.setText("XXX " + userRequest.getName().substring(5, 10) + " XXX");
+                    progressDialog.hide();
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    progressDialog.hide();
+                }
+            });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                progressDialog.hide();
-            }
-        });
-
+        } else progressDialog.hide();
 
         contactBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +108,7 @@ public class RequestDetailsFragment extends Fragment {
         approveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialog(loginUser.getType().equalsIgnoreCase("donor") ? RequestStatus.COMPLETED : RequestStatus.ACCEPTED);
+                openDialog(loginUser.getType().equals(UserType.DONOR.getValue()) ? RequestStatus.COMPLETED : RequestStatus.ACCEPTED);
             }
         });
         rejectBtn.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +141,7 @@ public class RequestDetailsFragment extends Fragment {
 
 
     private void updateStatus(RequestStatus status) {
-        progressDialog.setMessage("Update R...");
+        progressDialog.setMessage("Update Request...");
         progressDialog.setIndeterminate(true);
         progressDialog.show();
         Map<String, Object> data = new HashMap<>();
@@ -180,7 +170,7 @@ public class RequestDetailsFragment extends Fragment {
     private void sendNotification(String message) {
         APICall apiCall
                 = new APICall();
-        apiCall.sendNote(userRequest.getToken(), "Request Processing", msg.getText().toString());
+        apiCall.sendNote(userRequest.getToken(), "Request Processing", message);
     }
 
     public void openDialog(final RequestStatus status) {
@@ -236,17 +226,7 @@ public class RequestDetailsFragment extends Fragment {
         cancelBT.setLayoutParams(negBtnLP);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+
 
     @Override
     public void onDestroyView() {

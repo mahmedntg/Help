@@ -1,11 +1,9 @@
 package com.dalal.help.ui.requests;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -14,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.dalal.help.LoginActivity;
 import com.dalal.help.R;
 import com.dalal.help.utils.Request;
 import com.dalal.help.utils.RequestAdapter;
@@ -35,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -55,24 +53,23 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
     private User user;
     DatabaseReference userRef;
     FloatingActionButton fab;
+    DatabaseReference serviceTypeRef;
+    ArrayAdapter<String> dataAdapter;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_requests, container, false);
-        fab = view.findViewById(R.id.fab);
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
-        progressDialog = new ProgressDialog(getContext());
+        progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
         requestRef = FirebaseDatabase.getInstance().getReference("requests");
-        serviceTypeSpinner = (Spinner) view.findViewById(R.id.serviceType);
-        final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),
+        serviceTypes.add("All");
+        serviceTypeRef = FirebaseDatabase.getInstance().getReference("services");
+        dataAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, serviceTypes);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        serviceTypeSpinner.setAdapter(dataAdapter);
-        serviceTypes.add("All");
-        DatabaseReference serviceTypeRef = FirebaseDatabase.getInstance().getReference("services");
         serviceTypeRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -87,20 +84,26 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
 
             }
         });
+        user = UserUtils.getInstance(getActivity()).getUser();
 
-        serviceTypeSpinner.setOnItemSelectedListener(this);
+    }
 
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_requests, container, false);
+        fab = view.findViewById(R.id.fab);
+        serviceTypeSpinner = (Spinner) view.findViewById(R.id.serviceType);
+        serviceTypeSpinner.setAdapter(dataAdapter);
         requests = new ArrayList<>();
         recyclerView = (RecyclerView) view.findViewById(R.id.myRecyclerView);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new RequestAdapter(requests, this);
         recyclerView.setAdapter(mAdapter);
 
-        user = UserUtils.getInstance(getActivity()).getUser();
         if (user.getType().equals(UserType.DONATOR.getValue())) {
             fab.show();
             fab.setOnClickListener(new View.OnClickListener() {
@@ -126,16 +129,15 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
         return view;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
-        displayRequests();
+        serviceTypeSpinner.setOnItemSelectedListener(this);
     }
 
     private void displayRequests() {
         Query query = requestRef;
-        if (user.getType().equalsIgnoreCase("admin")) {
+        if (user.getType().equals(UserType.ADMIN.getValue()) || user.getType().equals(UserType.DONOR.getValue())) {
             if (!serviceName.equalsIgnoreCase("All")) {
                 query = requestRef.orderByChild("serviceType").equalTo(serviceName);
             }
@@ -149,19 +151,19 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
                 requests.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     Request request = data.getValue(Request.class);
-                    if (user.getType().equalsIgnoreCase("admin") && request.getStatus().equals(RequestStatus.PENDING.getValue())) {
+                    if (user.getType().equals(UserType.ADMIN.getValue()) && request.getStatus().equals(RequestStatus.PENDING.getValue())) {
                         request.setKey(data.getKey());
                         requests.add(request);
-                    } else if (user.getType().equalsIgnoreCase("donor") && request.getStatus().equals(RequestStatus.ACCEPTED.getValue())) {
+                    } else if (user.getType().equals(UserType.DONOR.getValue()) && request.getStatus().equals(RequestStatus.ACCEPTED.getValue())) {
                         request.setKey(data.getKey());
                         requests.add(request);
-                    } else if (user.getType().equalsIgnoreCase("donator") && !request.getStatus().equals(RequestStatus.COMPLETED.getValue())) {
+                    } else if (user.getType().equals(UserType.DONATOR.getValue()) && !request.getStatus().equals(RequestStatus.COMPLETED.getValue())) {
                         request.setKey(data.getKey());
                         requests.add(request);
                     }
                 }
                 LayoutAnimationController layout_animation =
-                        AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_fall_down);
+                        AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_animation_fall_down);
 
                 recyclerView.setLayoutAnimation(layout_animation);
                 mAdapter.notifyDataSetChanged();
@@ -209,17 +211,6 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
         displayRequests();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                firebaseAuth.signOut();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onDestroyView() {

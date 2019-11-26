@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.dalal.help.LoginActivity;
 import com.dalal.help.MainActivity;
 import com.dalal.help.R;
 import com.dalal.help.utils.Request;
@@ -35,25 +33,20 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 public class AddRequestFragment extends Fragment {
 
-    private AddRequestViewModel galleryViewModel;
     private EditText nameET, amountET, descriptionET;
     private Spinner serviceTypeSpinner;
     List<String> list = new ArrayList<>();
     private AlertDialog alertDialog;
     private ProgressDialog progressDialog;
     private DatabaseReference databaseReference;
-    private DatabaseReference userDatabaseReference;
     private FirebaseAuth firebaseAuth;
     private String serviceType;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        galleryViewModel =
-                ViewModelProviders.of(this).get(AddRequestViewModel.class);
         View view = inflater.inflate(R.layout.fragment_add_request, container, false);
         progressDialog = new ProgressDialog(view.getContext());
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext());
@@ -67,7 +60,6 @@ public class AddRequestFragment extends Fragment {
         alertDialog = alertDialogBuilder.create();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("requests");
-        userDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
         DatabaseReference serviceTypeRef = FirebaseDatabase.getInstance().getReference("services");
         nameET = (EditText) view.findViewById(R.id.serviceName);
         amountET = (EditText) view.findViewById(R.id.amount);
@@ -125,10 +117,10 @@ public class AddRequestFragment extends Fragment {
     public void addRequest(View view) {
         final String name = nameET.getText().toString().trim();
         final String description = descriptionET.getText().toString().trim();
-        final double amount = Double.valueOf(amountET.getText().toString().trim());
+        final String amount = amountET.getText().toString().trim();
         String message = getString(R.string.value_required_msg).trim();
 
-        if (TextUtils.isEmpty(name) && amount <= 0) {
+        if (TextUtils.isEmpty(name) && (TextUtils.isEmpty(amount) || Double.valueOf(amount) <= 0)) {
             message = TextUtils.isEmpty(name) ? MessageFormat.format(message, "Name") : MessageFormat.format(message, "Amount");
             alertDialog.setMessage(message);
             alertDialog.show();
@@ -142,7 +134,7 @@ public class AddRequestFragment extends Fragment {
         progressDialog.setMessage("Adding Request");
         progressDialog.show();
         String key = databaseReference.push().getKey();
-        Request request = new Request(name, amount, description, RequestStatus.PENDING.getValue(), firebaseAuth.getCurrentUser().getUid(), serviceType);
+        Request request = new Request(name, TextUtils.isEmpty(amount) ? 0.0 : Double.valueOf(amount), description, RequestStatus.PENDING.getValue(), firebaseAuth.getCurrentUser().getUid(), serviceType);
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(key, request);
         databaseReference.updateChildren(childUpdates);
@@ -150,17 +142,6 @@ public class AddRequestFragment extends Fragment {
         startActivity(new Intent(this.getContext(), MainActivity.class));
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                firebaseAuth.signOut();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onDestroyView() {

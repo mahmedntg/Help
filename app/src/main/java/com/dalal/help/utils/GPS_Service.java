@@ -1,10 +1,13 @@
 package com.dalal.help.utils;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,6 +17,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 
 public class GPS_Service extends Service implements LocationListener {
@@ -60,6 +64,7 @@ public class GPS_Service extends Service implements LocationListener {
         Log.d("Working", "Service Started");
     }
 
+
     public Location getLocation() {
         try {
             mlocationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
@@ -72,6 +77,10 @@ public class GPS_Service extends Service implements LocationListener {
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
                     //noinspection MissingPermission
+
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    }
                     mlocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, 0, this);
                     Log.d("Network", "Network");
                     if (mlocationManager != null) {
@@ -81,6 +90,7 @@ public class GPS_Service extends Service implements LocationListener {
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
                         }
+
                     }
                 }
 

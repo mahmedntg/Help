@@ -90,7 +90,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         public void setDelete(User user) {
             TextView textView = (TextView) mView.findViewById(R.id.delete);
-            if (user.getType().equalsIgnoreCase("donator")) {
+            if (user.getType().equals(UserType.DONATOR.getValue())) {
                 textView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

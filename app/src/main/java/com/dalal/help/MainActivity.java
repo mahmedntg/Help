@@ -1,11 +1,15 @@
 package com.dalal.help;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.dalal.help.utils.User;
+import com.dalal.help.utils.UserType;
 import com.dalal.help.utils.UserUtils;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 
+    private User user;
+    private NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,16 +36,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        User user = UserUtils.getInstance(this).getUser();
+        user = UserUtils.getInstance(this).getUser();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         Set<Integer> fragments = new HashSet<>();
 
         fragments.add(R.id.nav_requests);
-        if (!user.getType().equalsIgnoreCase("donator")) fragments.add(R.id.nav_add_request);
+        fragments.add(R.id.nav_add_request);
         fragments.add(R.id.nav_profile);
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(fragments)
                 .setDrawerLayout(drawer)
                 .build();
@@ -47,8 +55,12 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (!user.getType().equals(UserType.DONATOR.getValue())) {
+            navigationView.getMenu().findItem(R.id.nav_add_request).setVisible(false);
+        }
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -59,5 +71,17 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
