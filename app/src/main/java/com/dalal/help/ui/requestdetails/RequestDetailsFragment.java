@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,16 +18,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.dalal.help.LoginActivity;
+import com.dalal.help.MainActivity;
 import com.dalal.help.R;
 import com.dalal.help.call.APICall;
-import com.dalal.help.ui.requests.RequestsFragment;
 import com.dalal.help.utils.Request;
 import com.dalal.help.utils.RequestStatus;
 import com.dalal.help.utils.User;
 import com.dalal.help.utils.UserType;
 import com.dalal.help.utils.UserUtils;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,7 +37,6 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 public class RequestDetailsFragment extends Fragment {
 
@@ -81,7 +77,7 @@ public class RequestDetailsFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     userRequest = dataSnapshot.getValue(User.class);
-                    userTV.setText("XXX " + userRequest.getName().substring(5, 10) + " XXX");
+                    userTV.setText("XXX " + userRequest.getName().substring(2, 8) + " XXX");
                     progressDialog.hide();
                 }
 
@@ -149,11 +145,7 @@ public class RequestDetailsFragment extends Fragment {
         data.put("reason", msg.getText().toString());
         requestRef.child(request.getKey()).updateChildren(data);
         progressDialog.hide();
-        RequestsFragment requestsFragment = new RequestsFragment();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, requestsFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        startActivity(new Intent(getActivity(), MainActivity.class));
         String message;
         if (TextUtils.isEmpty(msg.getText().toString().trim())) {
             if (status.equals(RequestStatus.ACCEPTED))
@@ -225,7 +217,6 @@ public class RequestDetailsFragment extends Fragment {
         cancelBT.setTextColor(Color.RED);
         cancelBT.setLayoutParams(negBtnLP);
     }
-
 
 
     @Override

@@ -82,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
             alertDialog.show();
             return;
         } else if (TextUtils.isEmpty(email)) {
-            message = MessageFormat.format(message, "email");
+            message = MessageFormat.format(message, "Email");
             alertDialog.setMessage(message);
             alertDialog.show();
             return;

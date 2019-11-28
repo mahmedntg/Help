@@ -13,6 +13,8 @@ import com.dalal.help.ui.requests.RequestsFragment;
 
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -107,11 +109,11 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             RequestDetailsFragment requestDetailsFragment = new RequestDetailsFragment();
             requestDetailsFragment.setArguments(data);
-            FragmentTransaction fragmentTransaction = fragment.getActivity().getSupportFragmentManager().beginTransaction();
+            FragmentManager fragmentManager=fragment.getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.nav_host_fragment, requestDetailsFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
-
         }
 
     }

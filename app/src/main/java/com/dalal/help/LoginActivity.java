@@ -61,14 +61,14 @@ public class LoginActivity extends AppCompatActivity {
     public void loginUser(View view) {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
-        String message = getString(R.string.value_required_msg).trim();
+        String message = getString(R.string.value_required_msg);
         if (TextUtils.isEmpty(email)) {
             message = MessageFormat.format(message, "Email");
             alertDialog.setMessage(message);
             alertDialog.show();
             return;
         } else if (TextUtils.isEmpty(password)) {
-            alertDialog.setMessage("Password");
+            message = MessageFormat.format(message, "Password");
             alertDialog.show();
             return;
         }

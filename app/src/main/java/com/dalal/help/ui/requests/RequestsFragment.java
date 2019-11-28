@@ -34,6 +34,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -61,9 +62,6 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Loading...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
         requestRef = FirebaseDatabase.getInstance().getReference("requests");
         serviceTypes.add("All");
         serviceTypeRef = FirebaseDatabase.getInstance().getReference("services");
@@ -91,6 +89,9 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_requests, container, false);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         fab = view.findViewById(R.id.fab);
         serviceTypeSpinner = (Spinner) view.findViewById(R.id.serviceType);
         serviceTypeSpinner.setAdapter(dataAdapter);
@@ -193,8 +194,12 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
 
     private void swapFragment() {
         AddRequestFragment addRequestFragment = new AddRequestFragment();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment fragment = fragmentManager.getPrimaryNavigationFragment();
+        if (fragment != null) fragmentTransaction.detach(fragment);
         fragmentTransaction.replace(R.id.nav_host_fragment, addRequestFragment);
+
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

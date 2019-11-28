@@ -71,7 +71,7 @@ public class ProfileFragment extends Fragment {
                     alertDialog.setMessage(message);
                     alertDialog.show();
                     return;
-                } else if (name.length() < 15) {
+                } else if (name.length() < 10) {
                     alertDialog.setMessage("Name should be minimum 15 characters");
                     alertDialog.show();
                     return;
@@ -101,7 +101,8 @@ public class ProfileFragment extends Fragment {
         nameET.setText(name);
         phoneET.setText(phone);
         progressDialog.hide();
-
+        alertDialog.setMessage("Profile Updated Successfully");
+        alertDialog.show();
     }
 
     private void getLocation() {

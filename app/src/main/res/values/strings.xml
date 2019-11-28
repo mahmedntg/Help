@@ -12,8 +12,6 @@
     <string name="menu_add_request">Add Request</string>
     <string name="menu_update_profile">Update Profile</string>
     <string name="service_type">Select Service Type</string>
-    <string name="menu_tools">Tools</string>
-    <string name="menu_share">Share</string>
-    <string name="menu_send">Send</string>
+    <string name="menu_request_details">Request Details</string>
     <string name="value_required_msg">{0} is required</string>
 </resources>
