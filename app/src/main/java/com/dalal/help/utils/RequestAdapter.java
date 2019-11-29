@@ -13,7 +13,6 @@ import com.dalal.help.ui.requests.RequestsFragment;
 
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +43,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         Request model = requestList.get(position);
         user = fragment.getUser();
         viewHolder.setDelete(user);
-        viewHolder.setName(TextUtils.isEmpty(model.getName()) ? String.valueOf(model.getAmount()) : model.getName());
+        viewHolder.setName(TextUtils.isEmpty(model.getName()) ? model.getAmount() + " KWD" : model.getName());
         viewHolder.setStatus(model.getStatus());
         viewHolder.setServiceType(model.getServiceType());
 
@@ -109,7 +108,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             RequestDetailsFragment requestDetailsFragment = new RequestDetailsFragment();
             requestDetailsFragment.setArguments(data);
-            FragmentManager fragmentManager=fragment.getActivity().getSupportFragmentManager();
+            FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.nav_host_fragment, requestDetailsFragment);
             fragmentTransaction.addToBackStack(null);

@@ -186,6 +186,7 @@ public class RequestsFragment extends Fragment implements AdapterView.OnItemSele
         requestRef.child(key).removeValue();
         requests.remove(position);
         mAdapter.notifyDataSetChanged();
+        fab.show();
     }
 
     public User getUser() {

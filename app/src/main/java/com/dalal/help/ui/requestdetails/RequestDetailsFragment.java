@@ -64,8 +64,12 @@ public class RequestDetailsFragment extends Fragment {
         descriptionTV = (TextView) view.findViewById(R.id.description);
         userTV = (TextView) view.findViewById(R.id.user);
         request = (Request) getArguments().getSerializable("request");
-        nameTV.setText(request.getName());
-        descriptionTV.setText(request.getDescription());
+        if (TextUtils.isEmpty(request.getAmount())) {
+            nameTV.setText("Name:\n" + request.getName());
+        } else {
+            nameTV.setText("Amount:\n" + request.getAmount() + " KWD");
+        }
+        descriptionTV.setText("Description:\n" + request.getDescription());
         loginUser = UserUtils.getInstance(getActivity()).getUser();
         if (!loginUser.getType().equals(UserType.DONATOR.getValue())) {
             userTV.setVisibility(View.VISIBLE);
@@ -148,21 +152,26 @@ public class RequestDetailsFragment extends Fragment {
         startActivity(new Intent(getActivity(), MainActivity.class));
         String message;
         if (TextUtils.isEmpty(msg.getText().toString().trim())) {
-            if (status.equals(RequestStatus.ACCEPTED))
+            if (status.equals(RequestStatus.ACCEPTED)) {
                 message = "Your request has been approved";
-            else if (status.equals(RequestStatus.REJECTED))
+            } else if (status.equals(RequestStatus.REJECTED)) {
                 message = "Your request has been rejected";
-            else
+            } else {
                 message = "Your request has been completed";
+            }
         } else message = msg.getText().toString().trim();
         sendNotification(message);
 
     }
 
     private void sendNotification(String message) {
+        String title = "Request Processing";
+        if (loginUser.getType().equalsIgnoreCase(UserType.DONOR.getValue())) {
+            title = "Payment Succeeded";
+        }
         APICall apiCall
                 = new APICall();
-        apiCall.sendNote(userRequest.getToken(), "Request Processing", message);
+        apiCall.sendNote(userRequest.getToken(), title, message);
     }
 
     public void openDialog(final RequestStatus status) {

@@ -3,8 +3,7 @@ package com.dalal.help.utils;
 import java.io.Serializable;
 
 public class Request implements Serializable {
-    private String name, description, status, userId, serviceType, key, userServiceType;
-    private double amount;
+    private String name,amount, description, status, userId, serviceType, key, userServiceType;
 
     public Request() {
     }
@@ -15,7 +14,7 @@ public class Request implements Serializable {
         this.status = status;
     }
 
-    public Request(String name, double amount, String description, String status, String userId, String serviceType) {
+    public Request(String name, String amount, String description, String status, String userId, String serviceType) {
         this.name = name;
         this.amount = amount;
         this.description = description;
@@ -25,7 +24,7 @@ public class Request implements Serializable {
         this.userServiceType = userId + "__" + serviceType;
     }
 
-    public Request(double amount, String description, String status, String userId, String serviceType) {
+    public Request(String amount, String description, String status, String userId, String serviceType) {
         this.amount = amount;
         this.description = description;
         this.status = status;
@@ -42,11 +41,11 @@ public class Request implements Serializable {
         this.name = name;
     }
 
-    public double getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 

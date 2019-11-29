@@ -120,7 +120,7 @@ public class AddRequestFragment extends Fragment {
         final String amount = amountET.getText().toString().trim();
         String message = getString(R.string.value_required_msg).trim();
 
-        if (TextUtils.isEmpty(name) && (TextUtils.isEmpty(amount) || Double.valueOf(amount) <= 0)) {
+        if (TextUtils.isEmpty(name) && TextUtils.isEmpty(amount)) {
             message = TextUtils.isEmpty(name) ? MessageFormat.format(message, "Name") : MessageFormat.format(message, "Amount");
             alertDialog.setMessage(message);
             alertDialog.show();
@@ -134,7 +134,7 @@ public class AddRequestFragment extends Fragment {
         progressDialog.setMessage("Adding Request");
         progressDialog.show();
         String key = databaseReference.push().getKey();
-        Request request = new Request(name, TextUtils.isEmpty(amount) ? 0.0 : Double.valueOf(amount), description, RequestStatus.PENDING.getValue(), firebaseAuth.getCurrentUser().getUid(), serviceType);
+        Request request = new Request(name, amount, description, RequestStatus.PENDING.getValue(), firebaseAuth.getCurrentUser().getUid(), serviceType);
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(key, request);
         databaseReference.updateChildren(childUpdates);
