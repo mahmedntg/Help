@@ -13,6 +13,8 @@ import com.dalal.help.utils.UserType;
 import com.dalal.help.utils.UserUtils;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -118,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                return true;
+            case R.id.action_delete:
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                user.delete();
+                FirebaseDatabase.getInstance().getReference("users").child(user.getUid()).removeValue();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
             default:

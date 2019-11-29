@@ -77,8 +77,8 @@ public class RegisterActivity extends AppCompatActivity {
             alertDialog.setMessage(message);
             alertDialog.show();
             return;
-        } else if (name.length() < 15) {
-            alertDialog.setMessage("Name should be minimum 15 characters");
+        } else if (name.length() < 10) {
+            alertDialog.setMessage("Name should be minimum 10 characters");
             alertDialog.show();
             return;
         } else if (TextUtils.isEmpty(email)) {

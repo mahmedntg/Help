@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">dalal@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_logout">Logout</string>
+    <string name="action_delete">Deactivate Account</string>
     <string name="donor">Donor</string>
     <string name="donator">Donator</string>
     <string name="menu_requests">Requests</string>
